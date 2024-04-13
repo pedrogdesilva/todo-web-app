@@ -1,0 +1,43 @@
+<div class="card my-5">
+    <div class="card-body">
+      <form (ngSubmit)="onSubmit()" #taskForm="ngForm">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" [(ngModel)]="task.name" 
+            class="form-control" 
+            id="name" 
+            name="name" 
+            placeholder="Enter your name"
+            required #name="ngModel">
+        </div>
+        <div [hidden]="!name.pristine" class="alert alert-danger">Name is required</div>
+        <div class="form-group">
+          <label for="description">Description</label>
+          <input type="text" [(ngModel)]="task.description" 
+            class="form-control" 
+            id="description" 
+            name="description" 
+            placeholder="Enter description"
+            #description="ngModel">
+        </div>
+        <div class="form-group">
+            <label for="deadline">Deadline</label>
+            <input type="datetime" [(ngModel)]="task.deadline" 
+              class="form-control" 
+              id="deadline" 
+              name="deadline" 
+              required #deadline="ngModel">
+          </div>
+        <div [hidden]="!deadline.pristine" class="alert alert-danger">Deadline is required</div>
+        <div class="form-group">
+
+            <tr *ngFor="let category of categories">
+                <td>{{ category.name }}</td>
+              </tr>
+        </div>
+
+        <button type="submit" [disabled]="!taskForm.form.valid" 
+          class="btn btn-info">Submit</button>
+      </form>
+    </div>
+  </div>
