@@ -11,6 +11,7 @@ public class CatalogMapper {
 
         TaskCategoryEntity entity = new TaskCategoryEntity();
 
+        entity.setId(dto.getId());
         entity.setName(dto.getName());
         entity.setDescription(dto.getDescription());
 
@@ -21,6 +22,7 @@ public class CatalogMapper {
     public static TaskCategoryDTO getCategory(TaskCategoryEntity entity) {
 
         return new TaskCategoryDTO(
+                entity.getId(),
                 entity.getName(),
                 entity.getDescription()
         );

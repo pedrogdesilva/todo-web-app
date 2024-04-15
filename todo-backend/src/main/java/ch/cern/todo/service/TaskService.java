@@ -6,6 +6,7 @@ import ch.cern.todo.persistence.entity.TaskCategoryEntity;
 import ch.cern.todo.persistence.entity.TaskEntity;
 import ch.cern.todo.persistence.repository.TaskCategoryRepository;
 import ch.cern.todo.persistence.repository.TaskRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,16 +26,14 @@ public class TaskService {
         this.taskCategoryRepository = taskCategoryRepository;
     }
 
+    @Transactional
     public TaskEntity createTask(TaskDTO taskDTO) {
 
         TaskEntity task = TaskMapper.getTask(taskDTO);
 
+        // Task must exist (validation at controller level)
         Optional<TaskCategoryEntity> findRes = taskCategoryRepository.findByName(taskDTO.getCategory());
-        if (findRes.isEmpty()) {
-            //TODO: error input should be validated at controller level
-        } else {
-            task.setCategory(findRes.get());
-        }
+        task.setCategory(findRes.get());
 
         return taskRepository.save(task);
     }
@@ -43,12 +42,9 @@ public class TaskService {
         return taskRepository.findById(taskId);
     }
 
+    @Transactional
     public TaskEntity updateTask(TaskDTO taskDTO) {
         Optional<TaskEntity> taskToUpdateOpt = taskRepository.findById(taskDTO.getId());
-
-        if (taskToUpdateOpt.isEmpty()) {
-            // TODO : invalid state
-        }
 
         TaskEntity taskToUpdate = taskToUpdateOpt.get();
 
@@ -56,12 +52,9 @@ public class TaskService {
         taskToUpdate.setDescription(taskDTO.getDescription());
         taskToUpdate.setDeadline(taskDTO.getDeadline());
 
+        // Task must exist (validation at controller level)
         Optional<TaskCategoryEntity> taskCategoryOpt = taskCategoryRepository.findByName(taskDTO.getCategory());
-        if (taskCategoryOpt.isEmpty()) {
-            //TODO: error input should be validated at controller level
-        } else {
-            taskToUpdate.setCategory(taskCategoryOpt.get());
-        }
+        taskToUpdate.setCategory(taskCategoryOpt.get());
 
         return taskRepository.save(taskToUpdate);
     }

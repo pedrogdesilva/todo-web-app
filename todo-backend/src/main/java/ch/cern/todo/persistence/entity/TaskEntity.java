@@ -35,7 +35,7 @@ public class TaskEntity {
     @Column(name = "deadline", nullable = false)
     private LocalDateTime deadline;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private TaskCategoryEntity category;
 

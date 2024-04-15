@@ -1,5 +1,7 @@
 package ch.cern.todo.service;
 
+import ch.cern.todo.dto.TaskCategoryDTO;
+import ch.cern.todo.mapper.CatalogMapper;
 import ch.cern.todo.persistence.entity.TaskCategoryEntity;
 import ch.cern.todo.persistence.repository.TaskCategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,11 @@ public class CatalogService {
         List<TaskCategoryEntity> categories = new ArrayList<>();
         taskCategoryRepository.findAll().forEach(categories::add);
         return categories;
+    }
+
+    public TaskCategoryEntity addTaskCategory(TaskCategoryDTO dto) {
+        TaskCategoryEntity entity = CatalogMapper.getCategory(dto);
+        return taskCategoryRepository.save(entity);
     }
 
 

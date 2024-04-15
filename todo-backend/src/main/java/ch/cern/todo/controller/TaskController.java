@@ -4,18 +4,26 @@ import ch.cern.todo.dto.TaskDTO;
 import ch.cern.todo.mapper.TaskMapper;
 import ch.cern.todo.persistence.entity.TaskEntity;
 import ch.cern.todo.service.TaskService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -53,14 +61,15 @@ public class TaskController {
 
     @CrossOrigin
     @PutMapping("/create")
-    public ResponseEntity<TaskDTO> createTask(@RequestBody TaskDTO task) {
+    public ResponseEntity<TaskDTO> createTask(@Valid @RequestBody TaskDTO task) {
         TaskEntity newTask = taskService.createTask(task);
         return ResponseEntity.ok().body(TaskMapper.getTask(newTask));
     }
 
     @CrossOrigin
     @PostMapping("/update")
-    public ResponseEntity<TaskDTO> updateTask(@RequestBody TaskDTO task) {
+    public ResponseEntity<TaskDTO> updateTask(@Valid @RequestBody TaskDTO task) {
+
         Optional<TaskEntity> newTask = taskService.getTask(task.getId());
 
         if(newTask.isEmpty()) {
@@ -70,5 +79,18 @@ public class TaskController {
         TaskEntity updatedTask = taskService.updateTask(task);
 
         return ResponseEntity.ok().body(TaskMapper.getTask(updatedTask));
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
     }
 }
